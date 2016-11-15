@@ -7,8 +7,8 @@
 (defmacro defun-speedy (name lambda-list &body body &environment env)
   (declare (ignorable env))
   `(progn
-     #+(or) (declaim (inline ,name)) 
-     #+lispworks ,@(when env `((declaim (notinline ,name)))) 
+     #+(or) (declaim (inline ,name))
+     #+lispworks ,@(when env `((declaim (notinline ,name))))
      (defun ,name ,lambda-list
        #+(or) (declare (optimize speed))
        ,@body)))
@@ -16,7 +16,7 @@
 
 (defun fc (class-designator)
   (typecase class-designator
-    (class    class-designator)  
+    (class    class-designator)
     (keyword (fc (string class-designator)))
     (string  (fc (read-from-string class-designator)))
     (symbol  (find-class class-designator))
@@ -45,18 +45,18 @@
 (define-symbol-macro ? (describe *))
 
 
-#+swank 
-(defun ^ (thing &optional wait)
-  (swank:inspect-in-emacs thing :wait wait))
+;; #+swank
+;; (defun ^ (thing &optional wait)
+;;   (swank:inspect-in-emacs thing :wait wait))
 
-#+swank
-(define-symbol-macro ^* (^ *))
+;; #+swank
+;; (define-symbol-macro ^* (^ *))
 
-#+swank
-(define-symbol-macro ^** (^ **))
+;; #+swank
+;; (define-symbol-macro ^** (^ **))
 
-#+swank
-(define-symbol-macro ^*** (^ ***))
+;; #+swank
+;; (define-symbol-macro ^*** (^ ***))
 
 
 (defun finalize (class-designator)
