@@ -100,29 +100,23 @@
 
 
 (defvar *allocation-gate*
-  #+sbcl (sb-concurrency:make-gate :name "allocate" :open t)
-  #-sbcl nil)
+  nil)
+
 (defvar *truncation-lock*
-  #+sbcl (sb-thread:make-mutex :name "truncate")
-  #-sbcl (bt:make-lock "truncate"))
+   (bt:make-lock "truncate"))
 
 (defun check-allocate-okay ()
-  (assert *mmap-may-allocate*)
-  #+sbcl (sb-concurrency:wait-on-gate *allocation-gate*))
+  (assert *mmap-may-allocate*))
 
 (defun check-mmap-truncate-okay ()
   (assert (not (zerop (logand osicat-posix:MAP-SHARED *mmap-sharing*))))
   (check-allocate-okay))
 
 (defun begin-disruptive-operation ()
-  #+sbcl (sb-thread:grab-mutex *truncation-lock*)
-  #+sbcl (sb-concurrency:close-gate *allocation-gate*)
-  #-sbcl (bt:acquire-lock *truncation-lock*))
+  (bt:acquire-lock *truncation-lock*))
 
 (defun end-disruptive-operation ()
-  #+sbcl (sb-concurrency:open-gate *allocation-gate*)
-  #+sbcl (sb-thread:release-mutex *truncation-lock*)
-  #-sbcl (bt:release-lock *truncation-lock*))
+  (bt:release-lock *truncation-lock*))
 
 (defmacro with-exclusive-operation (&body body)
   `(unwind-protect (progn
@@ -147,7 +141,7 @@
                         (check-mmap-truncate-okay)
                         (osicat-posix:ftruncate fd min-bytes)
                         (setf bytes min-bytes))
-                      (assert (>= bytes +word-length+))	   
+                      (assert (>= bytes +word-length+))
                       (let ((ptr (osicat-posix:mmap (cffi:null-pointer) bytes
                                    protection sharing fd 0)))
                         (unwind-protect
@@ -168,7 +162,7 @@
 (defun mtagmap-resize (mtagmap new-len)
   (assert (not (mtagmap-closed-p mtagmap)))
   (check-mmap-truncate-okay)
-  (with-exclusive-operation 
+  (with-exclusive-operation
     (symbol-macrolet ((len (mtagmap-len mtagmap)))
       (flet ((trunc ()
                (osicat-posix:ftruncate (mtagmap-fd mtagmap) new-len))
@@ -193,7 +187,7 @@
                               ((> len new-len) (remap) (trunc))
                               (t               (trunc) (remap)))
                             (setf done t))
-            (unless done (mtagmap-close mtagmap)))))))  
+            (unless done (mtagmap-close mtagmap)))))))
   (mtagmap-check mtagmap))
 
 
@@ -292,4 +286,3 @@
 	      (mtagmap-next m)
 	      (mtagmap-len m)
 	      (mtagmap-default-filename m)))))
-

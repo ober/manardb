@@ -20,31 +20,24 @@
   :author            "Dan Lentz <danlentz@gmail.com>"
   :maintainer        "Dan Lentz <danlentz@gmail.com>"
   :depends-on (:alexandria :osicat :iterate :closer-mop :contextl :cl-irregsexp
-                           #-sbcl :bordeaux-threads
-                           #+sbcl :sb-concurrency)
+			   :bordeaux-threads)
   :components ((:module src :serial t
                  :components ((:static-file "manardb.asd")
                                (:file "package")
-                               (:file "widths")  
-                               (:file "utils")   
-                               (:file "struct")  
-                               (:file "mop")     
-                               (:file "mtagmap") 
-                               (:file "class")   
-                               (:file "types")   
+                               (:file "widths")
+                               (:file "utils")
+                               (:file "struct")
+                               (:file "mop")
+                               (:file "mtagmap")
+                               (:file "class")
+                               (:file "types")
                                (:file "iterator")
-                               (:file "array")   
-                               (:file "box")     
+                               (:file "array")
+                               (:file "box")
                                (:file "finalize")
                                (:file "filesystem")
-                               (:file "fixed-string") 
-                               (:file "mcons")        
-                               (:file "gc")           
+                               (:file "fixed-string")
+                               (:file "mcons")
+                               (:file "gc")
                                (:file "rewrite-gc")
                                ))))
-
-
-
-
-
-
